@@ -9,6 +9,7 @@ namespace Configs
     public class LevelsConfig : ScriptableObject
     {
         [SerializeField] private List<LevelData> _levelsData;
+        [field: SerializeField] public float NextLevelDelay { get; private set; }
 
         public LevelData GetLevelData(int id)
         {

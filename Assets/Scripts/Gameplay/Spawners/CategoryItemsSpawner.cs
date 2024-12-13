@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Configs;
+using Gameplay.Data;
 using Gameplay.Enums;
 using Gameplay.Views;
 using UnityEngine;
@@ -10,13 +12,31 @@ namespace Gameplay.Spawners
         [SerializeField] private CategoriesContainer _categoriesContainer;
         [SerializeField] private CategoryItemView _itemViewPrefab;
         
+        public List<CategoryItemView> SpawnRandomMany(CategoryType categoryType, List<Transform> parents, Vector2 parentScaleToFit = default)
+        {
+            var result = new List<CategoryItemView>();
+            var itemsData = _categoriesContainer.GetConfig(categoryType).GetRandomItemsData(parents.Count);
+            for (var i = 0; i < parents.Count; i++)
+            {
+                var parent = parents[i];
+                result.Add(SpawnRandomInternal(itemsData[i], parent, parentScaleToFit));
+            }
+
+            return result;
+        }
+        
         public CategoryItemView SpawnRandom(CategoryType categoryType, Transform parent, Vector2 parentScaleToFit = default)
         {
             var categoryConfig = _categoriesContainer.GetConfig(categoryType);
-            
-            var itemView = Instantiate(_itemViewPrefab, parent.transform);
+
             var itemData= categoryConfig.GetRandomItemData();
-            
+            return SpawnRandomInternal(itemData, parent, parentScaleToFit);
+        }
+
+        private CategoryItemView SpawnRandomInternal(CategoryItemData itemData, Transform parent, Vector2 parentScaleToFit = default)
+        {
+            var itemView = Instantiate(_itemViewPrefab, parent.transform);
+
             if (parentScaleToFit!=default)
             {
                 var scalableWrapper = parent.transform.GetChild(0);

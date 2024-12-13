@@ -1,38 +1,58 @@
 using System;
 using Configs;
 using Gameplay.Levels.Data;
+using Gameplay.Managers.Interfaces;
 using UnityEngine;
+using VContainer;
 
 namespace Gameplay.Managers
 {
-    public class LevelStarter : MonoBehaviour
+    public class LevelStarter : MonoBehaviour, ILevelStarter
     {
-        public event Action<LevelData> LevelStarted;
+        public event Action<LevelData, bool> LevelStarted;
         
         [SerializeField] private LevelsConfig _levelsConfig;
         private LevelData _currentLevelData;
+        private IAnswersLogicValidator _answersValidator;
+        
+        [Inject]
+        public void Construct(IAnswersLogicValidator answersValidator)
+        {
+            _answersValidator = answersValidator;
+        }
 
+        private void OnEnable()
+        {
+            _answersValidator.CorrectAnswerDone += OnLevelCompleted;
+        }
+
+        private void OnLevelCompleted()
+        {
+            Invoke(nameof(SetNextLevel), _levelsConfig.NextLevelDelay);
+        }
+        
         private void Start()
         {
             _currentLevelData = _levelsConfig.GetLevelData(0);
-            LevelStarted?.Invoke(_currentLevelData);
+            LevelStarted?.Invoke(_currentLevelData, true);
         }
 
-        public void SetNextLevel()
+        private void SetNextLevel()
         {
-            var nextLevelIndex = _currentLevelData.Id + 1;
-            var levelData = _levelsConfig.GetLevelData(nextLevelIndex);
-            if (levelData==null)
+            _currentLevelData = _levelsConfig.GetLevelData(_currentLevelData.Id + 1);
+            if (_currentLevelData==null)
             {
                 Debug.LogWarning("Out of levels, restarting....");
                 _currentLevelData = _levelsConfig.GetLevelData(0);
-                LevelStarted?.Invoke(_currentLevelData);
+               
             }
-            else
-            {
-                _currentLevelData = levelData;
-                LevelStarted?.Invoke(_currentLevelData);
-            }
+            LevelStarted?.Invoke(_currentLevelData,false);
+        }
+        
+        private void OnDisable()
+        {
+            _answersValidator.CorrectAnswerDone -= OnLevelCompleted;
+            CancelInvoke();
         }
     }
 }
