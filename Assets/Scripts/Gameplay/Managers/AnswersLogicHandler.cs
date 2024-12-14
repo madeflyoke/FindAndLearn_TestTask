@@ -20,21 +20,13 @@ namespace Gameplay.Managers
         {
             var count = levelData.GridSize.x * levelData.GridSize.y;
 
-            var items = _categoriesContainer.GetConfig(levelData.Category).GetRandomItemsDataExcept(count, _previousCorrectAnswers);
-            correctAnswer = ChooseCorrectAnswer(items);
+            var items = _categoriesContainer.GetConfig(levelData.Category)
+                .GetRandomItemsDataExcept(count, _previousCorrectAnswers, out correctAnswer);
+            _currentCorrectAnswerData = correctAnswer;
+            _previousCorrectAnswers.Add(_currentCorrectAnswerData);
             return items;
         }
-
-        private CategoryItemData ChooseCorrectAnswer(List<CategoryItemData> variants)
-        {
-            _currentCorrectAnswerData = variants[UnityEngine.Random.Range(0, variants.Count)];
-            _previousCorrectAnswers.Add(_currentCorrectAnswerData);
-#if UNITY_EDITOR
-            Debug.LogWarning(_currentCorrectAnswerData.Id);
-#endif
-            return _currentCorrectAnswerData;
-        }
-
+        
         public bool CallOnValidateAnswer(string answerId)
         {
             if (_currentCorrectAnswerData.Id == answerId)
