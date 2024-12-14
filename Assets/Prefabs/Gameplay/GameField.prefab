@@ -76,8 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f762f180644263949bf7520b470db41a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _categoriesContainer: {fileID: 11400000, guid: c25f37b4a779a8440b7afc91585fea08, type: 2}
-  _itemViewPrefab: {fileID: 2638747060582971488, guid: 6c698c1fd197d2d4794e1d87c21d473a, type: 3}
+  _itemViewPrefab: {fileID: 3997364588330665250, guid: 6c698c1fd197d2d4794e1d87c21d473a, type: 3}
 --- !u!114 &7475793424823469097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90,7 +89,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ff193beee9502848bb0a272c7461a63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <BordersOffset>k__BackingField: {x: 2.08, y: 1.5}
+  <BordersOffset>k__BackingField: {x: 3.28, y: 2.12}
 --- !u!1 &1886748255087409976
 GameObject:
   m_ObjectHideFlags: 0

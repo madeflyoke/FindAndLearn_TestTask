@@ -1,58 +1,26 @@
-using System;
 using Configs;
 using Gameplay.Levels.Data;
 using Gameplay.Managers.Interfaces;
 using UnityEngine;
-using VContainer;
 
 namespace Gameplay.Managers
 {
     public class LevelStarter : MonoBehaviour, ILevelStarter
     {
-        public event Action<LevelData, bool> LevelStarted;
-        
         [SerializeField] private LevelsConfig _levelsConfig;
         private LevelData _currentLevelData;
-        private IAnswersLogicValidator _answersValidator;
-        
-        [Inject]
-        public void Construct(IAnswersLogicValidator answersValidator)
-        {
-            _answersValidator = answersValidator;
-        }
 
-        private void OnEnable()
+        public bool StartLevel(out LevelData levelData, bool initial)
         {
-            _answersValidator.CorrectAnswerDone += OnLevelCompleted;
-        }
-
-        private void OnLevelCompleted()
-        {
-            Invoke(nameof(SetNextLevel), _levelsConfig.NextLevelDelay);
+            var isValid = TryStartNextLevel(initial ? 0 : _currentLevelData.Id + 1);
+            levelData = _currentLevelData;
+            return isValid;
         }
         
-        private void Start()
+        private bool TryStartNextLevel(int id)
         {
-            _currentLevelData = _levelsConfig.GetLevelData(0);
-            LevelStarted?.Invoke(_currentLevelData, true);
-        }
-
-        private void SetNextLevel()
-        {
-            _currentLevelData = _levelsConfig.GetLevelData(_currentLevelData.Id + 1);
-            if (_currentLevelData==null)
-            {
-                Debug.LogWarning("Out of levels, restarting....");
-                _currentLevelData = _levelsConfig.GetLevelData(0);
-               
-            }
-            LevelStarted?.Invoke(_currentLevelData,false);
-        }
-        
-        private void OnDisable()
-        {
-            _answersValidator.CorrectAnswerDone -= OnLevelCompleted;
-            CancelInvoke();
+            _currentLevelData = _levelsConfig.GetLevelData(id);
+            return _currentLevelData != null;
         }
     }
 }

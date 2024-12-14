@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Gameplay.Data;
 using Gameplay.Enums;
 using UnityEngine;
@@ -12,24 +13,33 @@ namespace Configs
         [field: SerializeField] public CategoryType Type { get; private set; }
         [field: SerializeField] public List<CategoryItemData> ItemsData { get; private set; }
 
-        public List<CategoryItemData> GetRandomItemsData(int count)
+        public List<CategoryItemData> GetRandomItemsDataExcept(int count, HashSet<CategoryItemData> exclude)
         {
-            if (ItemsData.Count<count)
-            {
-                Debug.LogWarning("Required items count too large, filling with repeatables...");
-                var result = new List<CategoryItemData>();
-                for (int i = 0; i < count; i++)
-                {
-                    result.Add(GetRandomItemData());
-                }
+            var resultHashSet = new HashSet<CategoryItemData>(ItemsData.ShuffledCopy());
+            resultHashSet.ExceptWith(exclude);
 
-                return result;
+            var countDifference = resultHashSet.Count - count;
+            if (countDifference < 0)
+            {
+                Debug.LogWarning(
+                    $"Required items count conditions too large and too strange, filling {Mathf.Abs(countDifference)} with repeatables...");
+                return FillItemsWithRepeatables(resultHashSet, Mathf.Abs(countDifference));
             }
-            
-            return ItemsData.ShuffledCopy().GetRange(0, count);
+
+            return resultHashSet.ToList().GetRange(0, count);
         }
-        
-        public CategoryItemData GetRandomItemData()
+
+        private List<CategoryItemData> FillItemsWithRepeatables(HashSet<CategoryItemData> currentItems, int requiredCount)
+        {
+            var result = currentItems.ToList();
+            for (int i = 0; i < requiredCount; i++)
+            {
+                result.Add(GetRandomItemData());
+            }
+            return result;
+        }
+
+        private CategoryItemData GetRandomItemData()
         {
             return ItemsData[Random.Range(0, ItemsData.Count)];
         }

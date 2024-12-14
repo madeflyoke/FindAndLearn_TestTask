@@ -6,13 +6,13 @@ namespace Gameplay.Views
     public class CategoryItemView : MonoBehaviour
     {
         public CategoryItemData RelatedData { get; private set; }
-        
-        [SerializeField] private SpriteRenderer _spriteRenderer;
 
+        [field: SerializeField] public SpriteRenderer SpriteRendererHolder { get; private set; }
+        
         public void Initialize(CategoryItemData relatedData)
         {
             RelatedData = relatedData;
-            _spriteRenderer.sprite = relatedData.RelatedSprite;
+            SpriteRendererHolder.sprite = relatedData.RelatedSpriteData.RelatedSprite;
         }
     }
 }

@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 using Gameplay.Views;
+using StateMachine;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 namespace Gameplay.Spawners
 {
@@ -11,16 +12,18 @@ namespace Gameplay.Spawners
         public Vector2 CellSize => _cellPrefab.CellSize;
     
         [SerializeField] private CategoryItemCellView _cellPrefab;
-        private IObjectResolver _resolver;
-
-        private void Awake()
+        
+        private Func<CategoryItemCellView, Vector3, Quaternion, Transform, CategoryItemCellView> _factory;
+        
+        [Inject]
+        public void Initialize(Func<CategoryItemCellView, Vector3, Quaternion,Transform, CategoryItemCellView> factory)
         {
-            _resolver = FindObjectOfType<LifetimeScope>().Container;
+            _factory = factory;
         }
-
+        
         public CategoryItemCellView Spawn(Vector2 position, Transform parent)
         {
-            return _resolver.Instantiate(_cellPrefab, position, Quaternion.identity, parent:parent);
+            return _factory(_cellPrefab,position, Quaternion.identity,  parent);
         }
     
     }

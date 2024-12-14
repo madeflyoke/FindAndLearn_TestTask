@@ -1,38 +1,46 @@
 using System;
 using System.Collections.Generic;
-using Gameplay.Creators.Interfaces;
+using Configs;
 using Gameplay.Data;
+using Gameplay.Levels.Data;
 using Gameplay.Managers.Interfaces;
 using UnityEngine;
 
 namespace Gameplay.Managers
 {
-    public class AnswersLogicHandler : IAnswersLogicValidator
+    public class AnswersLogicHandler : MonoBehaviour, IAnswersLogicValidator, IAnswersCreator
     {
-        public event Action CorrectAnswerDone; 
-        
-        private ICategoryItemsCreator _itemsCreator;
-        private CategoryItemData _correctAnswerData;
+        public event Action CorrectAnswerDone;
 
-        public AnswersLogicHandler(ICategoryItemsCreator itemsCreator)
+        [SerializeField] private CategoriesContainer _categoriesContainer;
+        private readonly HashSet<CategoryItemData> _previousCorrectAnswers = new HashSet<CategoryItemData>();
+        private CategoryItemData _currentCorrectAnswerData;
+
+        public List<CategoryItemData> Create(LevelData levelData, out CategoryItemData correctAnswer)
         {
-            _itemsCreator = itemsCreator;
-            _itemsCreator.ItemsCreated += SetCorrectAnswer;
+            var count = levelData.GridSize.x * levelData.GridSize.y;
+
+            var items = _categoriesContainer.GetConfig(levelData.Category).GetRandomItemsDataExcept(count, _previousCorrectAnswers);
+            correctAnswer = ChooseCorrectAnswer(items);
+            return items;
         }
 
-        private void SetCorrectAnswer(List<CategoryItemData> itemDatas)
+        private CategoryItemData ChooseCorrectAnswer(List<CategoryItemData> variants)
         {
-            _correctAnswerData = itemDatas[UnityEngine.Random.Range(0, itemDatas.Count)];
-            Debug.LogWarning(_correctAnswerData.Id);
+            _currentCorrectAnswerData = variants[UnityEngine.Random.Range(0, variants.Count)];
+            _previousCorrectAnswers.Add(_currentCorrectAnswerData);
+#if UNITY_EDITOR
+            Debug.LogWarning(_currentCorrectAnswerData.Id);
+#endif
+            return _currentCorrectAnswerData;
         }
 
         public bool CallOnValidateAnswer(string answerId)
         {
-            if (_correctAnswerData.Id==answerId)
+            if (_currentCorrectAnswerData.Id == answerId)
             {
                 CorrectAnswerDone?.Invoke();
                 return true;
-               
             }
 
             return false;

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Bootstrapper : MonoBehaviour
+public class Bootstrapper : MonoBehaviour //additional state by needs
 {
     private void Start()
     {

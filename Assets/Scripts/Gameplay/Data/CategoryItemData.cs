@@ -7,6 +7,6 @@ namespace Gameplay.Data
     public class CategoryItemData
     {
         [field: SerializeField] public string Id { get; private set; }
-        [field: SerializeField] public Sprite RelatedSprite { get; private set; }
+        [field: SerializeField] public SpriteData RelatedSpriteData { get; private set; }
     }
 }
