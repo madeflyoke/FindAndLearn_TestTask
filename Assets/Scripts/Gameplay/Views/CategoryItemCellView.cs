@@ -16,12 +16,15 @@ namespace Gameplay.Views
 
         private CategoryItemView _currentItemView;
         private IAnswersLogicValidator _answersLogicValidator;
+        private EffectsService _effectsService;
+        
         private static bool s_correctAnswerDone;
         
         [Inject]
-        public void Construct(IAnswersLogicValidator answersLogicValidator)
+        public void Construct(IAnswersLogicValidator answersLogicValidator, EffectsService effectsService)
         {
             _answersLogicValidator = answersLogicValidator;
+            _effectsService = effectsService;
             s_correctAnswerDone = false;
         }
         
@@ -59,6 +62,7 @@ namespace Gameplay.Views
             else
             {
                 _elementAnimator.PlayBounceEffect(_currentItemView.transform);
+                _effectsService.PlayStarsVfx(transform.position);
             }
         }
     }

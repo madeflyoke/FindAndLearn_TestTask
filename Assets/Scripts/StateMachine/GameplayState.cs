@@ -11,12 +11,12 @@ namespace StateMachine
 {
     public class GameplayState : IState, IDisposable
     {
-        private readonly GameFlowStateMachine _stateMachine;
+        private readonly IStateMachine _stateMachine;
         private readonly IAnswersLogicValidator _answersLogicValidator;
         private readonly IScreenController _screenController;
         private CancellationTokenSource _cts;
         
-        public GameplayState(GameFlowStateMachine stateMachine, IObjectResolver objectResolver)
+        public GameplayState(IStateMachine stateMachine, IObjectResolver objectResolver)
         {
             _stateMachine = stateMachine;
             _answersLogicValidator = objectResolver.Resolve<IAnswersLogicValidator>();
